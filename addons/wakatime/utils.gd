@@ -85,7 +85,24 @@ static func _get_python_bin_from_windows_reg():
 		for key in output:
 			if not key.strip_edges():
 				continue
-			var bin = key.strip_edges().split(' ', false)[-1]
+			# output is like ROOTNODE KEY TYPE VALUE
+			# if path contains spaces, we replace them. 
+			key = key.strip_edges()
+			print("KEY ", key)
+
+			# replace 3 times multispaces, for create array at least of 3 first keys
+			# that we not interested in.
+			# Doing so, we didn't break pathes that contains spaces
+			var reg = RegEx.new()
+			reg.compile("\\S+")
+			var tokens = reg.search_all(key)
+			var bin = ""
+			for i in range(3, len(tokens)):
+				print("process token ", tokens[i], tokens[i].get_string())
+				bin += tokens[i].get_string() + " "
+			bin = bin.strip_edges()
+
+			print("BIN: ", bin)
 			if bin.ends_with('.exe') and _check_python_bin(bin):
 				return bin
 
